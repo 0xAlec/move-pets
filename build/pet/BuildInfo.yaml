@@ -1,0 +1,21 @@
+---
+compiled_package_info:
+  package_name: pet
+  address_alias_instantiation:
+    pet: "00000000000000000000000000000000"
+    std: "00000000000000000000000000000001"
+    sui: "00000000000000000000000000000002"
+  source_digest: B9A3C6428446D4523628B060523F8C37278843EFAAE8FC1E15C0F96CD9B6900D
+  build_flags:
+    dev_mode: true
+    test_mode: true
+    generate_docs: false
+    generate_abis: false
+    install_dir: ~
+    force_recompilation: false
+    additional_named_addresses: {}
+    architecture: ~
+    only_deps: false
+dependencies:
+  - MoveStdlib
+  - Sui
