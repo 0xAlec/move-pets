@@ -7,7 +7,8 @@ module pet::dragon {
   use std::debug;
   use sui::typed_id::{Self, TypedID};
   use sui::bag::{Self, Bag};
-  use pet::ability::{Self, Ability, Attack, Defense, Util};
+  use pet::ability::{Self, Ability};
+  use pet::item::{Self, Item};
   use std::option::{Self, Option};
 
 
@@ -17,9 +18,9 @@ module pet::dragon {
     defense: u8,
     mana: u8,
     // Optional Abilities
-    atk_ability: Option<Ability<Attack>>,
-    def_ability: Option<Ability<Defense>>,
-    util_ability: Option<Ability<Util>>,
+    atk_ability: Option<TypedID<Ability>>,
+    def_ability: Option<TypedID<Ability>>,
+    util_ability: Option<TypedID<Ability>>,
     inventory: TypedID<Bag>,
   }
 
@@ -33,10 +34,24 @@ module pet::dragon {
     d.defense
   }
 
-  public entry fun use_attack(d: &mut Dragon, _ctx: &mut TxContext) {
-    let ability = option::borrow(&d.atk_ability);
-    d.mana = d.mana - ability::get_mana_cost<Attack>(ability);
-    // Implement attack logic here
+  // Equips item: Adds item to inventory and increments stats accordingly
+  public entry fun equip_item<T>(d: &mut Dragon, i: Item<T>, inventory: &mut Bag, ctx: &mut TxContext){
+    // Increment stats
+
+    d.attack = d.attack + item::get_attack(&i);
+    d.defense = d.defense + item::get_defense(&i);
+    d.mana = d.mana + item::get_mana(&i);
+
+    // Equip ability
+    let item_ability = item::get_ability(&i);
+    let ability_ref = typed_id::new(item_ability);
+    
+    if (ability::is_attack(item_ability)){
+      option::fill(&mut d.atk_ability, ability_ref)
+    };
+
+    // Add item to inventory
+    bag::add(inventory, i, ctx);
   }
 
   // Writes

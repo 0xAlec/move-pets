@@ -1,15 +1,21 @@
 module pet::ability {
+  use sui::object::{Info};
 
-  struct Attack {}
-  struct Defense {}
-  struct Util {}
-
-  struct Ability<phantom T> has store{
+  struct Ability has key, store {
+    info: Info,
+    attack: bool,
+    defense: bool,
+    util: bool,
     mana_cost: u8,
   }
 
   // Reads
-  public fun get_mana_cost<T>(ability: &Ability<T>): u8 {
+  public fun get_mana_cost<Type>(ability: &Ability): u8 {
     ability.mana_cost
   }
+
+  public fun is_attack(ability: &Ability): bool {
+    ability.attack
+  }
+
 }
