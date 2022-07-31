@@ -8,17 +8,17 @@ module pet::dragon {
 
   struct Dragon has key {
     info: Info,
-    attack: u64, 
-    defense: u64,
+    attack: u8, 
+    defense: u8,
   }
 
   // Reads
 
-  public fun get_attack(d: &Dragon): u64 {
+  public fun get_attack(d: &Dragon): u8 {
     d.attack
   }
 
-  public fun get_defense(d: &Dragon): u64 {
+  public fun get_defense(d: &Dragon): u8 {
     d.defense
   }
 
@@ -27,8 +27,8 @@ module pet::dragon {
   public fun new_dragon(ctx: &mut TxContext): Dragon {
     let info = object::new(ctx);
     let id = object::info_id(&info);
-    let attack = generate_random(id);
-    let defense = generate_random(id);
+    let attack = generate_random(id, 1, 100);
+    let defense = generate_random(id, 1, 100);
     Dragon{
       info,
       attack,
@@ -42,11 +42,11 @@ module pet::dragon {
 
   // Utils
 
-  fun generate_random(id: &ID): u64 {
+  fun generate_random(id: &ID, lo: u8, hi: u8): u8 {
     let id_bytes = object::id_to_bytes(id);
     let hash = hash::sha2_256(id_bytes);
     let length = vector::length<u8>(&hash);
     debug::print<u64>(&length);
-    1 + length % 100
+    lo + (length as u8) % hi
   }
 }
