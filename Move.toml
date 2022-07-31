@@ -1,9 +1,0 @@
-[package]
-name = "pet"
-version = "0.0.1"
-
-[dependencies]
-Sui = { local = "../sui/crates/sui-framework" }
-
-[addresses]
-pet =  "0x0"
