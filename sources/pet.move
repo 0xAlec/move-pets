@@ -7,10 +7,9 @@ module pet::dragon {
   use std::debug;
   use sui::typed_id::{Self, TypedID};
   use sui::bag::{Self, Bag};
+  use std::option::{Self, Option};
   use pet::ability::{Self, Ability};
   use pet::item::{Self, Item};
-  use std::option::{Self, Option};
-
 
   struct Dragon has key {
     info: Info,
@@ -18,9 +17,9 @@ module pet::dragon {
     defense: u8,
     mana: u8,
     // Optional Abilities
-    atk_ability: Option<TypedID<Ability>>,
-    def_ability: Option<TypedID<Ability>>,
-    util_ability: Option<TypedID<Ability>>,
+    attack_ability: Option<Ability>,
+    defense_ability: Option<Ability>,
+    utility_ability: Option<Ability>,
     inventory: TypedID<Bag>,
   }
 
@@ -35,21 +34,27 @@ module pet::dragon {
   }
 
   // Equips item: Adds item to inventory and increments stats accordingly
-  public entry fun equip_item<T>(d: &mut Dragon, i: Item<T>, inventory: &mut Bag, ctx: &mut TxContext){
+  public entry fun equip_item(d: &mut Dragon, i: Item, inventory: &mut Bag, ctx: &mut TxContext){
     // Increment stats
-
     d.attack = d.attack + item::get_attack(&i);
     d.defense = d.defense + item::get_defense(&i);
     d.mana = d.mana + item::get_mana(&i);
 
     // Equip ability
     let item_ability = item::get_ability(&i);
-    let ability_ref = typed_id::new(item_ability);
-    
-    if (ability::is_attack(item_ability)){
-      option::fill(&mut d.atk_ability, ability_ref)
+    // logic re: ability type here
+    if (option::is_some(&item_ability)){
+      let ability = option::extract(&mut item_ability);
+      if (ability::get_type(&ability) == 0){
+        d.attack_ability = option::some(ability);
+      };
+      if (ability::get_type(&ability) == 1){
+        d.defense_ability = option::some(ability);
+      };
+      if (ability::get_type(&ability) == 2){
+        d.utility_ability = option::some(ability);
+      };
     };
-
     // Add item to inventory
     bag::add(inventory, i, ctx);
   }
@@ -59,9 +64,9 @@ module pet::dragon {
   public fun new_dragon(ctx: &mut TxContext): Dragon {
     // Generate stats
     let info = object::new(ctx);
-    let id = object::info_id(&info);
-    let attack = generate_random(id, 1, 100);
-    let defense = generate_random(id, 1, 100);
+    //let id = object::info_id(&info);
+    let attack = 0;
+    let defense = 0;
 
     // Create inventory
     let inventory = bag::new_with_max_capacity(ctx, 5);
@@ -73,9 +78,9 @@ module pet::dragon {
       attack,
       defense,
       mana: 50,
-      atk_ability: option::none(),
-      def_ability: option::none(),
-      util_ability: option::none(),
+      attack_ability: option::none(),
+      defense_ability: option::none(),
+      utility_ability: option::none(),
       inventory: inventory_id,
     }
   }

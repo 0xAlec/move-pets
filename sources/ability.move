@@ -1,21 +1,29 @@
 module pet::ability {
-  use sui::object::{Info};
+  use sui::tx_context::{TxContext};
+  use sui::object::{Self, Info};
 
-  struct Ability has key, store {
-    info: Info,
-    attack: bool,
-    defense: bool,
-    util: bool,
+  struct Ability has key, store, copy, drop {
+    type: u8,
+    effect: u8,
     mana_cost: u8,
   }
 
   // Reads
-  public fun get_mana_cost<Type>(ability: &Ability): u8 {
+  public fun get_mana_cost(ability: &Ability): u8 {
     ability.mana_cost
   }
 
-  public fun is_attack(ability: &Ability): bool {
-    ability.attack
+  public fun get_type(ability: &Ability): u8 {
+    ability.type
   }
 
+  // Writes
+
+  public fun create_ability(type: u8, stats: u8, _ctx: &mut TxContext): Ability {
+    Ability{
+      type,
+      effect: stats,
+      mana_cost: 0
+    }
+  }
 }

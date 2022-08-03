@@ -4,50 +4,44 @@ module pet::item {
   use pet::ability::{Ability};
   use sui::tx_context::{TxContext};
 
-  struct Attack {}
-  struct Defense {}
-  struct Util {}
-
-  struct ItemStats has store, copy{
+  struct Item has key, store {
+    info: Info,
     attack: u8,
     defense: u8,
     mana: u8,
     mana_cost: u8,
-  }
-
-  struct Item<phantom T> has key, store {
-    info: Info,
-    stats: ItemStats,
     ability: Option<Ability>,
   }
 
   // Reads
-  public fun get_attack<T>(i: &Item<T>): u8 {
-    i.stats.attack
+  public fun get_attack(i: &Item): u8 {
+    i.attack
   }
 
-  public fun get_defense<T>(i: &Item<T>): u8 {
-    i.stats.defense
+  public fun get_defense(i: &Item): u8 {
+    i.defense
   }
 
-  public fun get_mana<T>(i: &Item<T>): u8 {
-    i.stats.mana
+  public fun get_mana(i: &Item): u8 {
+    i.mana
   }
   
-  public fun get_mana_cost<T>(i: &Item<T>): u8 {
-    i.stats.mana_cost
+  public fun get_mana_cost(i: &Item): u8 {
+    i.mana_cost
   }
 
-  public fun get_ability<T>(i: &Item<T>): &Ability {
-    option::borrow<Ability>(&i.ability)
+  public fun get_ability(i: &Item): Option<Ability> {
+    i.ability
   }
 
   // Writes
-
-  public fun create_item<T>(stats: ItemStats, ability: Option<Ability>, ctx: &mut TxContext): Item<T> {
-    Item<T>{
+  public fun create_item(attack: u8, defense: u8, mana: u8, mana_cost: u8, ability: Option<Ability>, ctx: &mut TxContext): Item {
+    Item{
       info: object::new(ctx),
-      stats,
+      attack,
+      defense,
+      mana,
+      mana_cost,
       ability
     }
   }
